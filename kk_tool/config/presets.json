@@ -1,0 +1,22 @@
+{
+  "futa_bp_sos": {
+    "body": "bp.sac_clit2",
+    "penis": "BP_SoS",
+    "balls": null,
+    "display_penis": true,
+    "display_balls": false,
+    "is_trap": true,
+    "male_height_enabled": true,
+    "enable_bulge": 2,
+    "reset_huesos": [
+      "cf_d_kokan",
+      "cf_j_kokan",
+      "cf_d_ana",
+      "cf_j_ana"
+    ],
+    "pene": {
+      "tamano_referencia": null,
+      "compensar_altura": true
+    }
+  }
+}

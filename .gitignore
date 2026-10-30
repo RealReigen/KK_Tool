@@ -1,0 +1,29 @@
+# --- Datos del usuario: NUNCA subir ---
+
+# Rutas y ajustes de cada PC (lo crea la app)
+settings.json
+
+# Carpetas de trabajo con cards y resultados
+cards_entrada/
+salida/
+salida_donaciones/
+
+# Red de seguridad: ninguna card ni portada debe acabar en el repositorio
+*.png
+log.txt
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# --- Editores y sistema ---
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# --- Entregas comprimidas ---
+*.zip

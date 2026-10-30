@@ -1,0 +1,85 @@
+KK_Tool - herramienta para cards de Koikatsu
+
+1) Necesitas Python 3.10+ (python.org). Marca "Add Python to PATH".
+2) Doble clic en instalar.bat (solo la primera vez).
+3) Doble clic en abrir_programa.bat -> se abre la ventana.
+   Si algo falla, abre una consola en esta carpeta y escribe: python -m kk_tool
+
+PESTAÑAS
+- Cada pestaña tiene sus propias carpetas (boton "Carpetas...") y se recuerdan
+  entre sesiones en settings.json (no lo borres si quieres conservarlas).
+- "Actualizar" vuelve a leer las carpetas (por si añades cards).
+- "Enviar a papelera" (o la tecla Supr) manda las cards seleccionadas a la papelera de
+  Windows, con confirmacion. Se pueden recuperar desde la papelera.
+- A la derecha se ve la portada de la card seleccionada.
+- Tamaños: arrastra el borde entre dos cabeceras para cambiar el ancho de una columna,
+  y los divisores entre la lista, el visor y el registro. Se recuerdan entre sesiones.
+
+BUSCAR, ORDENAR Y FILTRAR (todas las listas de cards)
+- Buscar: escribe en el cuadro; busca en nombre de archivo, nombre de la card y donante. Varias palabras =
+  todas deben aparecer. No distingue mayusculas ni tildes (cafe = Café). Esc o la ✕ lo borra. Ctrl+F desde la lista.
+- Ordenar: desplegable (orden de carga, nombre de archivo como Windows [card2 antes que card10], nombre de la
+  card, fecha de modificacion, fecha de creacion, tamaño, plugins, altura, pecho, tipo...) y boton ▲/▼ para
+  el sentido. Tambien puedes hacer clic en la cabecera de una columna (otro clic invierte). Se recuerda.
+- Filtros (boton «Filtros»): una fila de casillas por atributo: Tipo, Altura (baja/media/alta), Pecho
+  (pequeño/medio/grande). Dentro de una fila las casillas suman (baja O alta); entre filas se combinan (altura
+  alta Y pecho grande). Sin casillas marcadas en una fila = esa fila no filtra. «Limpiar» quita texto y casillas.
+- En «Leer datos» hay columnas Altura y Pecho con la categoria y la puntuacion (0 = neutro; negativo = menor).
+- Las cards ocultas por un filtro NO se pierden: conservan sus casillas (pestaña Donante → Receptores) y vuelven
+  al limpiar. Las receptoras marcadas pero ocultas tambien se incluyen al crear (la pestaña te lo avisa).
+- Los cortes (a partir de que puntuacion una card es «alta» o «pecho grande») son orientativos y se ajustan en
+  config\atributos.json. Para añadir otro atributo filtrable basta con añadir un bloque ahi (lee su «_ayuda»).
+
+TAMAÑO DEL PENE (v0.5.2): el pene cuelga del cuerpo y hereda su escala. Si la futa es baja (slider de altura bajo
+y/o hueso cf_n_height) el pene se encoge igual y en las escenas H los personajes quedan lejos (la female anima en
+el aire). Al convertir a futa (y al donar a una futa) se calcula la altura total del cuerpo (hueso x slider) y se
+pone en cm_J_dan100_00 una escala que deja el pene del tamaño de la male de muestra (slider 0.6, sin huesos).
+Si la altura ya es la de referencia no se escribe nada. Ejemplo: slider -0.73 -> pene x1.35.
+«Leer datos» tiene la columna «Pene (efectivo)» (1.02 = referencia; corto/ok/largo) y un filtro «Pene» para
+localizar futas ya hechas con el pene corto. Los numeros del juego estan en config\medidas.json (altura_slider:
+escala = 0.9 + 0.2 x slider, calibrado con una medida: si mides otra altura y no encaja, cambia esos dos numeros).
+
+REPARAR EL PENE DE FUTAS YA HECHAS (v0.5.3): pestaña «Reparar pene (futas)». Las futas que convertiste antes de la
+v0.5.2 pueden tener el pene corto. Carga tus carpetas, pulsa «Seleccionar las que lo necesitan» (elige entre las filas
+visibles las futas completas con el pene fuera de referencia; respeta busqueda y filtros) y luego «Reparar
+seleccionadas». Crea COPIAS en <salida>\reparadas (mismas subcarpetas que la entrada), nunca toca los originales
+ni sobrescribe. Solo cambia el hueso del pene (cm_J_dan100_00); tras guardar relee la copia y comprueba que el
+tamaño es el de referencia y que NADA mas cambio (sexo, nombre, cuerpo, cara, plugins, resto de huesos). Se omiten
+las que no son futa completa (esas, en «Female → Futa») y las que ya estan bien.
+
+GENITALES AL CONVERTIR A FUTA: los huesos de la zona genital (cf_d_kokan, cf_j_kokan, y los del ano)
+se resetean a sus valores por defecto, porque si la female los traia deformados el pene sale
+aplastado y se pueden romper las animaciones. La lista se edita en config\presets.json ("reset_huesos").
+Lo mismo se hace al donar un cuerpo a una receptora que acaba como futa/male.
+
+Los originales nunca se modifican. Las convertidas van a <salida>\male\ y el registro queda en
+<salida>\log.txt. Si la entrada tiene subcarpetas, la salida repite la misma estructura
+(entrada\A\B\x.png -> salida\male\A\B\x.png).
+Al actualizar a una version nueva, descomprime encima: settings.json se conserva.
+
+PESTAÑA "Donante -> Receptores"
+  Sirve para: una card tiene buena ropa y cabeza pero mal cuerpo -> se crea una COPIA con el
+  cuerpo de otra card (el donante). Los originales no se tocan.
+  1) Izquierda: elige UNA card donante (boton "Carpetas..." para indicar donde estan).
+  2) Derecha: marca las receptoras (clic en la casilla o barra espaciadora; hay botones
+     "Marcar todas", "Ninguna" y "Marcar las seleccionadas").
+  3) Elige el modo (total / sinaltura / pechos). Si marcas "Convertir tambien a futa", las receptoras
+     female se convierten a futa en la MISMA operacion (quedan en male); las futa ya completas solo
+     reciben el cuerpo y las male nativas se omiten. Despues pulsa "Crear cards con el cuerpo del donante"
+     y confirma. Si el donante esta marcado entre las receptoras, se omite.
+  Resultado: <salida>\<nombre del donante>\female|male\<personaje>_<modo>.png
+  - El nombre de la card pasa a ser "Nombre original [modo: Donante]", p. ej. "Gwen Tennyson [total: Otogi]"
+    (modos: total / sin altura / pechos). El archivo lleva solo el nombre y el modo: Gwen Tennyson_total.png
+  - La portada lleva una franja gris abajo con "Cuerpo: Donante" (necesita Pillow: instalar.bat).
+  - La lista muestra la columna "Cuerpo de" para reconocer las cards donadas.
+  - Registro en <salida>\log.txt. Cada card se relee y se verifica tras guardarla.
+  - Modos y reglas, franja (color, alto, fuentes) y formato del nombre: config\donaciones.json
+
+  Tambien por consola:
+  python -m kk_tool donate <donante.png> <receptora.png o carpeta> [...] --modo total|sinaltura|pechos
+        [--salida carpeta] [--body-guid fijo|donante] [--sin-portada] [--futa]
+
+CASILLAS EN «FEMALE → FUTA» (v0.5.4): la lista lleva casillas ☐/☑. Marca las cards con un clic en la casilla (o con la
+barra espaciadora sobre las filas seleccionadas); hacer clic en otra fila solo cambia la portada del visor y NO desmarca
+nada. Botones: «Marcar todas» (solo las visibles), «Ninguna» y «Marcar las seleccionadas». «Convertir marcadas a futa»
+convierte todas las marcadas, incluidas las que un filtro tenga ocultas (la pestaña te lo avisa).

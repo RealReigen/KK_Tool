@@ -1,0 +1,93 @@
+{
+  "_ayuda": [
+    "Atributos que se pueden FILTRAR y ORDENAR en las listas de cards. Para añadir uno nuevo basta con",
+    "añadir un bloque aquí: aparece solo como grupo de filtro, como opción de orden y (en 'Leer datos') como columna.",
+    "origen 'puntuacion': puntuacion = suma de peso * (medida - neutro) de cada termino. La categoria sale de 'cortes':",
+    "  la primera cuya 'hasta' sea MAYOR que la puntuacion (el ultimo corte no lleva 'hasta').",
+    "  medidas: 'slider:N' (slider N de shapeValueBody) o 'hueso:NOMBRE:x|y|z' (escala del hueso ABMX; si la card no lo tiene = neutro).",
+    "origen 'campo': la categoria es el valor de un campo del resumen de la card (p. ej. 'tipo').",
+    "Los cortes son orientativos: ajustalos a tu gusto mirando la puntuacion que muestra la columna.",
+    "origen 'campo' admite 'numero': campo numerico del resumen que se usa para ordenar (p. ej. pene_efectivo)."
+  ],
+  "atributos": [
+    {
+      "clave": "tipo",
+      "titulo": "Tipo",
+      "origen": "campo",
+      "campo": "tipo",
+      "categorias": [
+        "female",
+        "male",
+        "futa",
+        "futa incompleta"
+      ]
+    },
+    {
+      "clave": "altura",
+      "titulo": "Altura",
+      "origen": "puntuacion",
+      "terminos": [
+        {
+          "medida": "slider:0",
+          "neutro": 0.5,
+          "peso": 1.0
+        },
+        {
+          "medida": "hueso:cf_n_height:y",
+          "neutro": 1.0,
+          "peso": 1.0
+        }
+      ],
+      "cortes": [
+        {
+          "nombre": "baja",
+          "hasta": -0.08
+        },
+        {
+          "nombre": "media",
+          "hasta": 0.08
+        },
+        {
+          "nombre": "alta"
+        }
+      ]
+    },
+    {
+      "clave": "pecho",
+      "titulo": "Pecho",
+      "origen": "puntuacion",
+      "terminos": [
+        {
+          "medida": "slider:4",
+          "neutro": 0.5,
+          "peso": 1.0
+        }
+      ],
+      "cortes": [
+        {
+          "nombre": "pequeño",
+          "hasta": -0.12
+        },
+        {
+          "nombre": "medio",
+          "hasta": 0.12
+        },
+        {
+          "nombre": "grande"
+        }
+      ]
+    },
+    {
+      "clave": "pene",
+      "titulo": "Pene",
+      "origen": "campo",
+      "campo": "pene_estado",
+      "numero": "pene_efectivo",
+      "categorias": [
+        "corto",
+        "ok",
+        "largo"
+      ]
+    }
+  ]
+}

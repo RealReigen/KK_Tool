@@ -1,0 +1,13 @@
+{
+  "_ayuda": [
+    "Medidas del juego usadas para calcular el tamano efectivo del pene (ver editors/penis_size.py).",
+    "altura_slider: el slider de altura (shapeValueBody[0]) escala todo el cuerpo (pene incluido): escala = base + pendiente * slider.",
+    "  Calibrado midiendo el pene de una misma card con slider 0.6 y -0.7307 (largo 75 vs 55 px, ancho 20 vs 15 px): ratio 0.73-0.75;",
+    "  el modelo 0.9 + 0.2*slider predice 0.739. Un solo par de puntos: si mides otro (p. ej. slider 0 o 1) y no encaja, cambia estos dos numeros.",
+    "referencia_slider: altura de slider de la card male de muestra cuyo pene se toma como tamano correcto (0.6).",
+    "pene_ok: rango de tamano efectivo que se marca como 'ok' en la columna/filtro Pene (1.0 = male con slider 0.5 y sin huesos)."
+  ],
+  "altura_slider": {"base": 0.9, "pendiente": 0.2},
+  "referencia_slider": 0.6,
+  "pene_ok": [0.95, 1.05]
+}
