@@ -2,6 +2,11 @@
 
 Newest first. The early v1–v7 numbering referred to the project status document; the code started at v0.1.
 
+## 0.5.7 — 2026-10-31
+Second batch of the comfort-only phase (no new functionality).
+- **The cover preview always fits the space it has**: it is rescaled whenever the viewer changes size (smooth resize with Pillow, up to ×2), so it is no longer cut and no manual adjusting is needed (`gui/widgets/preview.py`).
+- **Visible dividers**: new `gui/widgets/split_pane.py` replaces `ttk.Panedwindow` (whose divider is almost invisible on Windows) with a wide grey bar and a resize cursor, in the three places that used it (list/preview, list/log, donor tab). Same interface, so saved layouts keep working.
+
 ## 0.5.6 — 2026-10-31
 First batch of the comfort-only phase (no new functionality).
 - **Keyboard works outside the list** (`gui/widgets/key_router.py`): ↑/↓ move the selection of the active list, **Enter** checks/unchecks the selected rows (checkbox lists only), **Ctrl+A** selects all visible rows (not in single-selection lists) and **Esc** clears the selection. They never act while the focus is in a text box, drop-down or the log, so typing is not affected. Dialogs are ignored.

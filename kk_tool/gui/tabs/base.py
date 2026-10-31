@@ -5,6 +5,7 @@ import tkinter as tk
 from tkinter import messagebox, ttk
 
 from ..widgets.card_panel import BASE_COLUMNS, CardPanel  # noqa: F401  (BASE_COLUMNS se reexporta)
+from ..widgets.split_pane import SplitPane
 from ..widgets.worker import Worker
 
 
@@ -21,7 +22,7 @@ class CardListTab(ttk.Frame):
                              on_error=lambda e: self.write(f"ERROR: {type(e).__name__}: {e}"))
 
         # zona central redimensionable: (panel = carpetas + lista + visor) arriba, registro abajo
-        self.outer = ttk.Panedwindow(self, orient="vertical")
+        self.outer = SplitPane(self, orient="vertical")
         self.outer.pack(fill="both", expand=True)
         self.panel = CardPanel(self.outer, settings, self.key, self.title, self.columns,
                                log=self.write, on_change=self._sync_buttons,

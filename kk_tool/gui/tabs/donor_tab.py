@@ -13,6 +13,7 @@ from ...core.settings import ROOT_DIR
 from ...editors import cover_text
 from ...editors.donor import load_config
 from ..widgets.card_panel import CardPanel, altura_txt
+from ..widgets.split_pane import SplitPane
 from ..widgets.worker import Worker
 from .futa_tab import CHECK_HINT
 
@@ -77,9 +78,9 @@ class DonorTab(ttk.Frame):
         self.desc_lbl.pack(fill="x", padx=10, pady=(0, 2))
 
         # --- centro: dos paneles arriba, registro abajo ---
-        self.outer = ttk.Panedwindow(self, orient="vertical")
+        self.outer = SplitPane(self, orient="vertical")
         self.outer.pack(fill="both", expand=True, padx=0, pady=(2, 0))
-        self.split = ttk.Panedwindow(self.outer, orient="horizontal")
+        self.split = SplitPane(self.outer, orient="horizontal")
         self.donor = CardPanel(self.split, settings, "donar_donante", "Donante", DONOR_COLUMNS,
                                log=self.write, selectmode="browse", on_change=self._sync,
                                preview_size=(260, 360))

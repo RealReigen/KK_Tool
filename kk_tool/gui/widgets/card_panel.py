@@ -16,6 +16,7 @@ from ...readers.fileinfo import file_info, fmt_date
 from .filter_bar import FilterBar
 from .folders_dialog import FoldersDialog
 from .preview import CardPreview
+from .split_pane import SplitPane
 from .worker import Worker
 
 MIN_COL_W = 30          # ancho mínimo de una columna al arrastrar su borde
@@ -108,7 +109,7 @@ class CardPanel(ttk.Frame):
                                    on_change=self.apply_view, open_by_default=filters_open)
         self.filterbar.pack(fill="x", padx=8, pady=(2, 2))
 
-        self.pw = ttk.Panedwindow(self, orient="horizontal")
+        self.pw = SplitPane(self, orient="horizontal")
         self.pw.pack(fill="both", expand=True, padx=8, pady=(4, 8))
         left = ttk.Frame(self.pw)
         keys = ([("chk", "✓", 34)] if checkable else []) + [(k, t, w) for k, t, w, _ in columns]
@@ -131,8 +132,8 @@ class CardPanel(ttk.Frame):
         sb.pack(side="right", fill="y")
         self.tree.pack(side="left", fill="both", expand=True)
         self.preview = CardPreview(self.pw, *preview_size)
-        self.pw.add(left, weight=1)
-        self.pw.add(self.preview, weight=0)
+        self.pw.add(left, weight=1, minsize=200)
+        self.pw.add(self.preview, weight=0, minsize=150)
 
         self.tree.bind("<<TreeviewSelect>>", self._on_select)
         self.tree.bind("<ButtonPress-1>", self._press, add="+")
