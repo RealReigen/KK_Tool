@@ -3,6 +3,7 @@
 Cada panel tiene su `key`: con ella recuerda en settings.json sus carpetas, el ancho de las
 columnas y el ancho del visor (tabs.<key>.folders / col_widths / layout.preview_w).
 Se usa en las pestañas normales (CardListTab) y dos veces en Donante → Receptores.
+Teclado (↑↓ Enter Ctrl+A Esc) fuera de la lista: ver key_router.py; las acciones viven aquí.
 """
 import tkinter as tk
 from tkinter import ttk
@@ -19,6 +20,7 @@ from .worker import Worker
 
 MIN_COL_W = 30          # ancho mínimo de una columna al arrastrar su borde
 CHECK_ON, CHECK_OFF = "☑", "☐"
+SHIFT_MASK = 0x0001     # bit de Mayús en event.state
 
 
 def altura_txt(s):
@@ -58,6 +60,8 @@ def attribute_columns(skip=("tipo",)):
 
 
 class CardPanel(ttk.Frame):
+    is_card_panel = True     # marca que usa KeyRouter para saber a qué lista pertenece el foco
+
     def __init__(self, master, settings, key, title, columns, log, checkable=False,
                  selectmode="extended", on_change=None, default_folders=None, preview_size=(300, 420),
                  filters_open=False):
@@ -70,11 +74,15 @@ class CardPanel(ttk.Frame):
         self.paths, self.summaries, self.checked = {}, {}, set()   # iid -> Path / resumen; iids marcados
         self.entries = {}      # iid -> Entry (todas las filas, también las ocultas por el filtro)
         self._seq = 0
+        self._check_anchor = None     # última casilla tocada (origen del rango con Mayús+clic)
         self.loaded = False
         self._layout_done = False
         self._resizing_col = False
         self.worker = Worker(self, on_state=lambda _b: self._changed(),
                              on_error=lambda e: self._log(f"ERROR: {type(e).__name__}: {e}"))
+        router = getattr(self.winfo_toplevel(), "key_router", None)
+        if router:
+            router.register(self)
 
         # barra superior: carpetas / actualizar / estado. Las pestañas pueden añadir botones aquí.
         self.bar = ttk.Frame(self)
@@ -166,6 +174,33 @@ class CardPanel(ttk.Frame):
                 return self.summaries.get(iid)
         return None
 
+    # ---------- selección con teclado (la usa KeyRouter cuando el foco está fuera de la lista) ----------
+    def move_selection(self, delta):
+        """Mueve la selección una fila arriba/abajo (sin pasar del primero/último) y pone el foco en la lista."""
+        rows = self.tree.get_children()
+        if not rows:
+            return
+        cur = self.tree.focus()
+        if cur in rows:
+            idx = max(0, min(len(rows) - 1, rows.index(cur) + delta))
+        else:
+            idx = 0 if delta > 0 else len(rows) - 1
+        self.tree.focus_set()
+        self.tree.selection_set(rows[idx])
+        self.tree.focus(rows[idx])
+        self.tree.see(rows[idx])
+
+    def select_all_visible(self):
+        """Selecciona todas las filas visibles. False si la lista es de selección única."""
+        if str(self.tree.cget("selectmode")) != "extended":
+            return False
+        self.tree.selection_set(self.tree.get_children())
+        return True
+
+    def clear_selection(self):
+        if self.tree.selection():
+            self.tree.selection_set(())
+
     # ---------- casillas ----------
     def checked_paths(self):
         """Todas las marcadas: primero las visibles (en el orden mostrado), luego las que el filtro oculta."""
@@ -197,14 +232,35 @@ class CardPanel(ttk.Frame):
             self._set_check(iid, True)
         self._changed()
 
-    def _space(self, _event=None):
+    def toggle_selected_checks(self):
+        """Espacio / Enter: si todas las seleccionadas están marcadas las desmarca; si no, las marca."""
         sel = self.tree.selection()
-        if sel:
-            turn_on = not all(i in self.checked for i in sel)
-            for iid in sel:
-                self._set_check(iid, turn_on)
-            self._changed()
+        if not sel:
+            return False
+        turn_on = not all(i in self.checked for i in sel)
+        for iid in sel:
+            self._set_check(iid, turn_on)
+        focus = self.tree.focus()
+        self._check_anchor = focus if focus in sel else sel[-1]
+        self._changed()
+        return True
+
+    def _space(self, _event=None):
+        self.toggle_selected_checks()
         return "break"
+
+    def _check_range(self, iid):
+        """Mayús+clic en una casilla: pone todo el tramo entre la última casilla tocada y esta
+        (filas visibles) en el estado que tiene la última tocada. False si no hay origen válido."""
+        rows = list(self.tree.get_children())
+        anchor = self._check_anchor
+        if anchor not in rows or anchor == iid or iid not in rows:
+            return False
+        a, b = sorted((rows.index(anchor), rows.index(iid)))
+        turn_on = anchor in self.checked
+        for r in rows[a:b + 1]:
+            self._set_check(r, turn_on)
+        return True
 
     # ---------- ratón: arrastre de columnas y clic en casilla ----------
     def _press(self, event):
@@ -213,8 +269,13 @@ class CardPanel(ttk.Frame):
                 and self.tree.identify_column(event.x) == "#1":
             iid = self.tree.identify_row(event.y)
             if iid:
-                self._set_check(iid, iid not in self.checked)
+                shift = bool(event.state & SHIFT_MASK)
+                if not (shift and self._check_range(iid)):
+                    self._set_check(iid, iid not in self.checked)
+                self._check_anchor = iid
                 self._changed()
+                if shift:
+                    return "break"     # que Mayús+clic no cambie además la selección de filas
 
     def _release(self, _event):
         if self._resizing_col:
@@ -276,6 +337,7 @@ class CardPanel(ttk.Frame):
         self.paths.clear()
         self.summaries.clear()
         self.checked.clear()
+        self._check_anchor = None
         self._seq = 0
         self.preview.clear()
         self.filterbar.set_counts(0, 0)
@@ -299,6 +361,8 @@ class CardPanel(ttk.Frame):
         self.summaries.pop(iid, None)
         self.entries.pop(iid, None)
         self.checked.discard(iid)
+        if self._check_anchor == iid:
+            self._check_anchor = None
         self._update_counts()
 
     def _on_select(self, _event=None):

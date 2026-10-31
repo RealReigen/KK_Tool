@@ -2,6 +2,12 @@
 
 Newest first. The early v1–v7 numbering referred to the project status document; the code started at v0.1.
 
+## 0.5.6 — 2026-10-31
+First batch of the comfort-only phase (no new functionality).
+- **Keyboard works outside the list** (`gui/widgets/key_router.py`): ↑/↓ move the selection of the active list, **Enter** checks/unchecks the selected rows (checkbox lists only), **Ctrl+A** selects all visible rows (not in single-selection lists) and **Esc** clears the selection. They never act while the focus is in a text box, drop-down or the log, so typing is not affected. Dialogs are ignored.
+- **Shift+click** on a checkbox checks/unchecks the whole range since the last touched checkbox.
+- Help text of the checkbox lists updated (shared `CHECK_HINT`).
+
 ## 0.5.5 — 2026-10-30
 - Fix: an exception inside a queued GUI callback no longer stops the `Worker` queue (the tab stayed "busy" forever).
 - `save_card` now refuses to write if the destination already exists (no longer relies on `original_file_path`).

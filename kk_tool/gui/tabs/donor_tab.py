@@ -14,6 +14,7 @@ from ...editors import cover_text
 from ...editors.donor import load_config
 from ..widgets.card_panel import CardPanel, altura_txt
 from ..widgets.worker import Worker
+from .futa_tab import CHECK_HINT
 
 DONOR_COLUMNS = [
     ("archivo", "Archivo", 150, lambda p, s: p.name),
@@ -100,7 +101,7 @@ class DonorTab(ttk.Frame):
         for text, cmd in (("Marcar todas", self.receptors.check_all), ("Ninguna", self.receptors.check_none),
                           ("Marcar las seleccionadas", self.receptors.check_selected)):
             ttk.Button(self.receptors.extra_bar, text=text, command=cmd).pack(side="left", padx=(0, 6))
-        ttk.Label(self.receptors.extra_bar, text="(clic en ☐ o barra espaciadora)").pack(side="left")
+        ttk.Label(self.receptors.extra_bar, text=CHECK_HINT.strip()).pack(side="left")
 
         self.split.bind("<ButtonRelease-1>", self._save_split)
         self.outer.bind("<ButtonRelease-1>", self._save_log_h)

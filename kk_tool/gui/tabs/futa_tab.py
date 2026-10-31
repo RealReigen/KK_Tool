@@ -9,6 +9,8 @@ from ...batch.convert import convert_cards
 from .base import CardListTab
 from .out_mixin import OutDirMixin
 
+CHECK_HINT = "   (☐ clic · Enter o espacio sobre las seleccionadas · Mayús+clic marca un rango)"
+
 
 class FutaTab(OutDirMixin, CardListTab):
     key = "futa"
@@ -31,8 +33,7 @@ class FutaTab(OutDirMixin, CardListTab):
         bar2.pack(fill="x", padx=8, pady=(0, 2), after=bar)
         self.info_lbl = ttk.Label(bar2)
         self.info_lbl.pack(side="left")
-        ttk.Label(bar2, text="   (clic en ☐ o barra espaciadora sobre las filas seleccionadas)",
-                  foreground="#555").pack(side="left")
+        ttk.Label(bar2, text=CHECK_HINT, foreground="#555").pack(side="left")
 
     def update_buttons(self):
         n = len(self.panel.checked_paths())

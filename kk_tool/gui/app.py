@@ -4,6 +4,7 @@ from tkinter import ttk
 
 from ..core.settings import Settings
 from .tabs import TABS
+from .widgets.key_router import KeyRouter
 
 
 class App(tk.Tk):
@@ -12,6 +13,7 @@ class App(tk.Tk):
         self.settings = settings
         self.title("KK Tool")
         self.geometry(settings.get("window.size", "1150x680"))
+        KeyRouter(self)     # antes de crear las pestañas: cada lista se registra al crearse
         self.nb = ttk.Notebook(self)
         self.nb.pack(fill="both", expand=True)
         self.tabs = []
