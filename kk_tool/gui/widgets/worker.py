@@ -47,7 +47,10 @@ class Worker:
         try:
             while True:
                 fn, args, kw = self.q.get_nowait()
-                fn(*args, **kw)
+                try:
+                    fn(*args, **kw)
+                except Exception as e:      # un fallo no debe parar la cola
+                    self._error(e)
         except queue.Empty:
             pass
         self._after = self.widget.after(100, self._poll)

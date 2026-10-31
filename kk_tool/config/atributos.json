@@ -30,7 +30,7 @@
         {
           "medida": "slider:0",
           "neutro": 0.5,
-          "peso": 1.0
+          "peso": 0.2
         },
         {
           "medida": "hueso:cf_n_height:y",
@@ -41,11 +41,11 @@
       "cortes": [
         {
           "nombre": "baja",
-          "hasta": -0.08
+          "hasta": -0.04
         },
         {
           "nombre": "media",
-          "hasta": 0.08
+          "hasta": 0.04
         },
         {
           "nombre": "alta"

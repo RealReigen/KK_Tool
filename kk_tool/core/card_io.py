@@ -15,6 +15,8 @@ def save_card(card, out_path):
     orig = getattr(card, "original_file_path", None)
     if orig and Path(orig).resolve() == out:
         raise ValueError(f"No se sobrescribe el original: {out}")
+    if out.exists():
+        raise ValueError(f"El destino ya existe, no se sobrescribe: {out}")
     out.parent.mkdir(parents=True, exist_ok=True)
     KKEx.LZ4_UNPACK = True
     card.save(str(out))

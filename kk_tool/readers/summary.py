@@ -89,7 +89,7 @@ def summarize(card):
     display_penis = bool(unc.get("DisplayPenis", False))
     tipo = classify(sex, is_trap, has_penis, display_penis)
     return {
-        "nombre": " ".join(x for x in (_get(p, "firstname"), _get(p, "lastname")) if x),
+        "nombre": " ".join(x for x in (_get(p, "lastname"), _get(p, "firstname")) if x),
         "nickname": _get(p, "nickname", ""),
         "sex": sex,
         "tipo": tipo,

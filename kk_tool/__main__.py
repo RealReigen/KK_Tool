@@ -39,6 +39,9 @@ def _donate(argv):
     a = ap.parse_args(argv)
     files = [p for p in a.receptoras if Path(p).is_file()]
     folders = [p for p in a.receptoras if Path(p).is_dir()]
+    for p in a.receptoras:
+        if not Path(p).exists():
+            print(f"AVISO: no existe y se ignora: {p}")
     cards, missing = find_cards_multi(folders) if folders else ([], [])
     recs = files + [str(c) for c in cards]
     try:

@@ -148,6 +148,8 @@ class FilterBar(ttk.Frame):
         self._after = self.after(DEBOUNCE_MS, self._fire)
 
     def _fire(self):
+        if self._after:
+            self.after_cancel(self._after)
         self._after = None
         if self.on_change:
             self.on_change()

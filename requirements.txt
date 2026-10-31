@@ -1,0 +1,3 @@
+kkloader==0.1.24
+send2trash
+pillow

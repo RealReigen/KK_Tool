@@ -2,6 +2,14 @@
 
 Newest first. The early v1–v7 numbering referred to the project status document; the code started at v0.1.
 
+## 0.5.5 — 2026-10-30
+- Fix: an exception inside a queued GUI callback no longer stops the `Worker` queue (the tab stayed "busy" forever).
+- `save_card` now refuses to write if the destination already exists (no longer relies on `original_file_path`).
+- `altura` attribute: the slider term now weighs 0.2 (measured model); cuts changed to ±0.04 (`atributos.json`).
+- Card list shows the name as last name + first name, like the game and the `[mode: donor]` tag.
+- `FilterBar.clear()` refreshes once; `donate` CLI warns about paths that do not exist.
+- Added `requirements.txt` and `__version__`.
+
 ## 0.5.4 — 2026-10-30
 - "Female → Futa" is now a **checklist**: ☐/☑ checkboxes independent of the preview selection (clicking another card to see its cover no longer unchecks the previous ones). New buttons: "Marcar todas" (check all), "Ninguna" (none) and "Marcar las seleccionadas" (check selected), plus a counter of checked cards.
 - `CardListTab.checkable`: any list tab can enable checkboxes.
