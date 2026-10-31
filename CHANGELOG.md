@@ -2,6 +2,9 @@
 
 Newest first. The early v1–v7 numbering referred to the project status document; the code started at v0.1.
 
+## 0.5.8 — 2026-10-31
+- "Female → Futa": cards that fail (exception, not a full futa after saving, wrong penis size, genital bones left) are now copied to `<output>/errores/` (same subfolders as the input) with a `.txt` giving the reason. The log summary names the folder (`batch/convert.py::copy_to_errors`).
+
 ## 0.5.7 — 2026-10-31
 Second batch of the comfort-only phase (no new functionality).
 - **The cover preview always fits the space it has**: it is rescaled whenever the viewer changes size (smooth resize with Pillow, up to ×2), so it is no longer cut and no manual adjusting is needed (`gui/widgets/preview.py`).

@@ -49,7 +49,8 @@ class FutaTab(OutDirMixin, CardListTab):
         if not messagebox.askyesno(
                 "Convertir",
                 f"¿Convertir {len(sel)} card(s) marcada(s) a futa?\nLos originales no se tocan; "
-                f"las nuevas irán a:\n{self.out_dir / 'male'} (con las mismas subcarpetas que la entrada)"):
+                f"las nuevas irán a:\n{self.out_dir / 'male'} (con las mismas subcarpetas que la entrada)\n"
+                f"Las que fallen se copiarán a:\n{self.out_dir / 'errores'}"):
             return
         out, roots = self.out_dir, self.panel.folders
         self.run_in_background(

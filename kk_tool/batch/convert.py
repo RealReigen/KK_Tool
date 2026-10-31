@@ -1,10 +1,14 @@
-"""Convierte varias cards a futa. Nunca sobrescribe originales ni salidas previas."""
+"""Convierte varias cards a futa. Nunca sobrescribe originales ni salidas previas.
+Las cards que fallan se copian (el original) a <salida>/errores/ con un .txt con el motivo."""
+import shutil
 from datetime import datetime
 from pathlib import Path
 from ..core.card_io import load_card, save_card
 from ..readers.summary import summarize, _fields, ABM
 from ..editors.futa import apply_futa, load_presets
 from ..editors.penis_size import verify_penis_size
+
+ERR_SUBDIR = "errores"
 
 
 def _free_name(folder, name):
@@ -31,13 +35,27 @@ def relative_parent(path, roots):
     return best if best is not None else Path(".")
 
 
+def copy_to_errors(path, out_root, roots, reason):
+    """Copia el ORIGINAL a <salida>/errores/<subcarpetas>/ y escribe <nombre>.txt con el motivo.
+    Devuelve la ruta mostrada (relativa a errores/). Nunca sobrescribe."""
+    sub = relative_parent(path, roots)
+    folder = Path(out_root) / ERR_SUBDIR / sub
+    folder.mkdir(parents=True, exist_ok=True)
+    dest = _free_name(folder, Path(path).name)
+    shutil.copy2(path, dest)
+    dest.with_suffix(".txt").write_text(
+        f"Archivo original: {path}\nFecha: {datetime.now():%Y-%m-%d %H:%M:%S}\nMotivo: {reason}\n",
+        encoding="utf-8")
+    return (sub / dest.name).as_posix() if sub != Path(".") else dest.name
+
+
 def _alt(s):
     return f"slider {s['altura_slider']} / hueso {s['altura_hueso']}"
 
 
 def convert_cards(paths, out_root, preset_name="futa_bp_sos", log=print, roots=None):
     """roots: carpetas de entrada; si se dan, la salida repite la estructura de subcarpetas:
-    <entrada>/A/B/x.png -> <salida>/male/A/B/x.png"""
+    <entrada>/A/B/x.png -> <salida>/male/A/B/x.png (y, si falla, <salida>/errores/A/B/x.png)"""
     preset = load_presets()[preset_name]
     out_male = Path(out_root) / "male"
     lines, ok, skipped, failed = [], 0, 0, 0
@@ -45,6 +63,14 @@ def convert_cards(paths, out_root, preset_name="futa_bp_sos", log=print, roots=N
     def say(msg):
         lines.append(msg)
         log(msg)
+
+    def fail(p, reason):
+        """Copia el original a errores/ (un fallo al copiar no detiene el lote)."""
+        try:
+            shown = copy_to_errors(p, out_root, roots, reason)
+            say(f"    -> original copiado a {ERR_SUBDIR}/{shown}")
+        except Exception as e2:
+            say(f"    (no se pudo copiar a {ERR_SUBDIR}/: {type(e2).__name__}: {e2})")
 
     for p in map(Path, paths):
         try:
@@ -62,19 +88,25 @@ def convert_cards(paths, out_root, preset_name="futa_bp_sos", log=print, roots=N
             same_h = (before["altura_slider"], before["altura_hueso"]) == \
                      (after["altura_slider"], after["altura_hueso"])
             if after["tipo"] != "futa":
-                say(f"AVISO: {p.name} guardada pero no queda como futa ({after['tipo']})")
+                reason = f"guardada pero no queda como futa ({after['tipo']})"
+                say(f"AVISO: {p.name} {reason}")
+                fail(p, reason)
                 failed += 1
                 continue
             saved = load_card(dest)
             pene_bad = verify_penis_size(saved, preset.get("pene"))
             if pene_bad:
-                say(f"AVISO: {p.name}: {'; '.join(pene_bad)}")
+                reason = "; ".join(pene_bad)
+                say(f"AVISO: {p.name}: {reason}")
+                fail(p, reason)
                 failed += 1
                 continue
             left = [b[0] for b in (_fields(saved["KKEx"].data, ABM).get("boneData") or [])
                     if b[0] in set(preset.get("reset_huesos") or [])]
             if left:
-                say(f"AVISO: {p.name}: tras guardar siguen estos huesos genitales: {left}")
+                reason = f"tras guardar siguen estos huesos genitales: {left}"
+                say(f"AVISO: {p.name}: {reason}")
+                fail(p, reason)
                 failed += 1
                 continue
             say(f"OK: {p.name} [{before['tipo']} -> futa] -> male/{shown}")
@@ -87,9 +119,11 @@ def convert_cards(paths, out_root, preset_name="futa_bp_sos", log=print, roots=N
             ok += 1
         except Exception as e:
             say(f"ERROR: {p.name}: {type(e).__name__}: {e}")
+            fail(p, f"{type(e).__name__}: {e}")
             failed += 1
 
-    say(f"\nResumen: {ok} convertidas, {skipped} omitidas, {failed} con problemas.")
+    say(f"\nResumen: {ok} convertidas, {skipped} omitidas, {failed} con problemas"
+        + (f" (originales en {Path(out_root) / ERR_SUBDIR})." if failed else "."))
     Path(out_root).mkdir(parents=True, exist_ok=True)
     with open(Path(out_root) / "log.txt", "a", encoding="utf-8") as f:
         f.write(f"\n--- {datetime.now():%Y-%m-%d %H:%M:%S} ---\n" + "\n".join(lines) + "\n")
