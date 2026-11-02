@@ -18,50 +18,63 @@ DUP_SUBDIR = "duplicados"
 class FutaIndex:
     def __init__(self, cache=None):
         self.cache = cache if cache is not None else FingerprintCache()
-        self.folder = None
+        self.folder = None       # carpeta principal (la salida)
+        self.roots = []          # principal + carpetas extra con las que también se compara
         self.by_fp = {}          # huella -> [(ruta, está_en_duplicados)]
         self.unreadable = 0
 
-    def _rel(self, path):
-        """Ruta relativa a la carpeta indexada (sin tocar el disco; con resolve() solo si hace falta)."""
+    def _locate(self, path):
+        """(carpeta_indexada, ruta_relativa) de `path`, o (None, None) si no cuelga de ninguna."""
         path = Path(path)
-        try:
-            return path.relative_to(self.folder)
-        except (ValueError, TypeError):
+        for root in self.roots:
             try:
-                return path.resolve().relative_to(self.folder.resolve())
+                return root, path.relative_to(root)
+            except (ValueError, TypeError):
+                pass
+        for root in self.roots:
+            try:
+                return root, path.resolve().relative_to(root.resolve())
             except (ValueError, AttributeError, OSError):
-                return None
+                pass
+        return None, None
 
     def add(self, fp, path):
-        rel = self._rel(path)
+        root, rel = self._locate(path)
         in_dups = rel is not None and DUP_SUBDIR in rel.parts[:-1]
         self.by_fp.setdefault(fp, []).append((Path(path), in_dups))
 
     def find_main(self, fp):
-        """Ruta de una card de male/ (fuera de duplicados/) con esa huella, o None."""
+        """Ruta de una card (fuera de duplicados/) con esa huella, o None."""
         return next((p for p, dup in self.by_fp.get(fp, ()) if not dup), None)
 
     def find_dups(self, fp):
-        """Ruta de una card de male/duplicados/ con esa huella, o None."""
+        """Ruta de una card de duplicados/ con esa huella, o None."""
         return next((p for p, dup in self.by_fp.get(fp, ()) if dup), None)
 
     def shown(self, path):
-        """Ruta relativa a la carpeta indexada (para mostrarla)."""
-        rel = self._rel(path)
-        return rel.as_posix() if rel is not None else str(path)
+        """Texto para mostrar: relativo a la carpeta principal; si está en una carpeta extra, ruta completa."""
+        root, rel = self._locate(path)
+        if rel is None:
+            return str(path)
+        return rel.as_posix() if root == self.folder else str(path)
 
     def __len__(self):
         return sum(len(v) for v in self.by_fp.values())
 
-    def scan(self, folder, progress=None, log=print):
-        """(Re)construye el índice de `folder`. progress(i, n) se llama por cada card.
+    def scan(self, folder, progress=None, log=print, extra=()):
+        """(Re)construye el índice de `folder` (+ las carpetas `extra`). progress(i, n) por cada card.
         Una card que no se pueda leer se avisa y se ignora: no detiene el índice."""
         self.folder = Path(folder)
+        self.roots = [self.folder]
+        for e in extra:
+            e = Path(e)
+            if e.is_dir() and all(e.resolve() != r.resolve() for r in self.roots):
+                self.roots.append(e)
         self.by_fp, self.unreadable = {}, 0
-        if not self.folder.is_dir():
-            return
-        cards = find_cards(self.folder)
+        cards = []
+        for root in self.roots:
+            if root.is_dir():
+                cards += find_cards(root)
         seen = set()
         for i, p in enumerate(cards, 1):
             if progress:
@@ -77,7 +90,8 @@ class FutaIndex:
                     log(f"[índice] no se pudo leer {self.shown(p)}: {type(e).__name__}: {e}")
                     continue
             self.add(fp, p)
-        self.cache.retain_under(self.folder, seen)
+        for root in self.roots:
+            self.cache.retain_under(root, seen)
         try:
             self.cache.save()
         except OSError as e:

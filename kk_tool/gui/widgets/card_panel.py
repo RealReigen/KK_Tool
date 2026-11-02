@@ -6,7 +6,7 @@ Se usa en las pestañas normales (CardListTab) y dos veces en Donante → Recept
 Teclado (↑↓ Enter Ctrl+A Esc) fuera de la lista: ver key_router.py; las acciones viven aquí.
 
 Ganchos opcionales que las pestañas pueden asignar (todos None = sin efecto):
-  check_tag(iid) -> nombre de tag | None   color de fondo de las filas MARCADAS (ver repaint_checked)
+  check_tag(iid, marcada) -> tag | None    color de fondo de cada fila (ver repaint)
   caption_extra(path) -> texto | ''        línea extra bajo la portada del visor
   on_loaded()                              se llama al terminar de leer las carpetas
 Con with_fingerprint=True cada resumen lleva también s['huella'] (huella de contenido de la card).
@@ -228,15 +228,15 @@ class CardPanel(ttk.Frame):
         self._paint(iid)
 
     def _paint(self, iid):
-        """Color de la fila según check_tag (solo las marcadas llevan color)."""
+        """Color de la fila según check_tag(iid, marcada)."""
         if self.check_tag is None:
             return
-        tag = self.check_tag(iid) if iid in self.checked else None
+        tag = self.check_tag(iid, iid in self.checked)
         self.tree.item(iid, tags=(tag,) if tag else ())
 
-    def repaint_checked(self):
-        """Vuelve a calcular el color de todas las marcadas (p. ej. cuando llega información nueva)."""
-        for iid in list(self.checked):
+    def repaint(self):
+        """Vuelve a calcular el color de todas las filas (p. ej. cuando llega información nueva)."""
+        for iid in list(self.paths):
             self._paint(iid)
 
     def check_all(self):

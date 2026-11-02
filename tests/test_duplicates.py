@@ -116,6 +116,24 @@ class TestConvertDuplicates(Base):
         self.assertFalse((self.male / "log.txt").exists())
 
 
+class TestExtraFolders(Base):
+    def test_futa_in_extra_folder_counts_as_done(self):
+        legacy = self.root / "viejas"
+        legacy.mkdir()
+        make_card(self.female / "ana.png", first="Ana")
+        old_male = self.root / "salida_male"
+        old_male.mkdir()
+        convert_cards([self.female / "ana.png"], legacy, self.report, log=lambda m: None, roots=[self.female])
+        idx = FutaIndex(FingerprintCache(self.root / "cache.json"))
+        idx.scan(self.male, log=lambda m: None, extra=[legacy, legacy, self.male, self.root / "no_existe"])
+        self.assertEqual(len(idx.roots), 2)                      # sin repetir ni contar la salida ni la inexistente
+        fp = fingerprint(load_card(self.female / "ana.png"))
+        self.assertEqual(idx.find_main(fp), legacy / "ana.png")
+        # la futa existe en la carpeta extra: convertir de nuevo la manda a male/duplicados/
+        self.assertEqual(self.convert(["ana.png"], idx), (0, 0, 0, 1))
+        self.assertTrue((self.male / DUP_SUBDIR / "ana.png").exists())
+
+
 class TestGamePaths(Base):
     def test_resolve(self):
         chara = self.root / "Koikatsu X" / "UserData" / "chara"

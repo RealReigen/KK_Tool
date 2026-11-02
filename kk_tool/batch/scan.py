@@ -17,8 +17,9 @@ def read_card_summary(path, defs=None, with_fingerprint=False):
     if with_fingerprint:
         try:
             s["huella"] = fingerprint(card)
-        except Exception:
+        except Exception as e:
             s["huella"] = None
+            s["huella_error"] = f"{type(e).__name__}: {e}"
     return s
 
 

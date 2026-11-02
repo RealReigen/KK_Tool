@@ -7,6 +7,17 @@ from .tabs import TABS
 from .widgets.key_router import KeyRouter
 
 
+def _fix_treeview_tag_colors():
+    """Tk 8.6.9 (el de Python 3.10 en Windows) ignora el color de fondo de las filas con tag en un Treeview.
+    Arreglo habitual: quitar del estilo la entrada que lo anula. En otras versiones no hace nada."""
+    style = ttk.Style()
+
+    def fixed(option):
+        return [e for e in style.map("Treeview", query_opt=option) if e[:2] != ("!disabled", "!selected")]
+
+    style.map("Treeview", foreground=fixed("foreground"), background=fixed("background"))
+
+
 class App(tk.Tk):
     def __init__(self, settings):
         super().__init__()
@@ -14,6 +25,7 @@ class App(tk.Tk):
         self.title("KK Tool")
         self.geometry(settings.get("window.size", "1150x680"))
         KeyRouter(self)     # antes de crear las pestañas: cada lista se registra al crearse
+        _fix_treeview_tag_colors()
         self.nb = ttk.Notebook(self)
         self.nb.pack(fill="both", expand=True)
         self.tabs = []

@@ -2,6 +2,15 @@
 
 Newest first. The early v1–v7 numbering referred to the project status document; the code started at v0.1.
 
+## 0.6.1 — 2026-11-02
+- **"Female → Futa" now tints ALL rows whose futa already exists in the output** (pastel yellow), not only the checked ones, and has a new column **"Futa en la salida"** (`SÍ · file` / `no`) that can be sorted. Nothing has to be remembered or checked: it is recomputed from the cards on disk every time (content fingerprints, cached). A checked row without a futa is still pastel blue.
+- New button **"Marcar las que faltan"** checks every visible card that has no futa yet; the counter shows "N of M already have a futa".
+- The output folder label turns red with a warning while no Koikatsu install has been chosen (output is then `KK_Tool/salida/male`).
+- Futas are also compared against extra folders: `KK_Tool/salida/male` (where earlier versions saved them) when it exists, plus any folder added with **"Comparar con…"** (`tabs.futa.compare_folders`).
+- Fix for Tk 8.6.9 (Python 3.10 on Windows), which ignores row background colors in a Treeview.
+- The "Instalación de Koikatsu…" / "Comparar con…" buttons no longer do nothing silently while the app is still reading or indexing: they now say so in the log. Folder pickers are opened with the main window as parent so they cannot hide behind it.
+- If a card's fingerprint cannot be computed the log says so (it used to fail silently and leave the row uncolored).
+
 ## 0.6.0 — 2026-10-31
 - **Koikatsu install path**: in "Female → Futa", the new "Instalación de Koikatsu…" button takes the game folder and sets the input to `UserData/chara/female` and the output to `UserData/chara/male` (accepts the install folder, `UserData`, `chara`, or either subfolder). "Carpetas…" and "Carpeta de salida…" still work. The remembered install is `game.install_dir` in `settings.json` (`core/game_paths.py`).
 - **The output folder is now the male folder itself** (setting `tabs.futa.out_male`; before it was a folder containing `male/`). The log (`log.txt`) and `errores/` stay in `KK_Tool/salida/` so nothing but cards goes into the game folder.

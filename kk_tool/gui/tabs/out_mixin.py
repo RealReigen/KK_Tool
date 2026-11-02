@@ -22,7 +22,7 @@ class OutDirMixin:
         self.out_lbl.configure(text=f"Salida: {self.out_dir}")
 
     def choose_out(self):
-        d = filedialog.askdirectory(title="Carpeta de salida", initialdir=str(self.out_dir))
+        d = filedialog.askdirectory(parent=self.winfo_toplevel(), title="Carpeta de salida", initialdir=str(self.out_dir))
         if d:
             self.settings.set(f"tabs.{self.key}.{self.out_setting}", os.path.normpath(d))
             self._update_out_label()
