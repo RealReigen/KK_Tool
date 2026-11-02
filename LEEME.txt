@@ -52,9 +52,9 @@ se resetean a sus valores por defecto, porque si la female los traia deformados 
 aplastado y se pueden romper las animaciones. La lista se edita en config\presets.json ("reset_huesos").
 Lo mismo se hace al donar un cuerpo a una receptora que acaba como futa/male.
 
-Los originales nunca se modifican. Las convertidas van a <salida>\male\ y el registro queda en
-<salida>\log.txt. Si la entrada tiene subcarpetas, la salida repite la misma estructura
-(entrada\A\B\x.png -> salida\male\A\B\x.png).
+Los originales nunca se modifican. En «Female → Futa» las convertidas van a la carpeta de salida (la male/ del
+juego, ver más abajo) y el registro queda en KK_Tool\salida\log.txt. En «Reparar pene» van a <salida>\reparadas.
+Si la entrada tiene subcarpetas, la salida repite la misma estructura (entrada\A\B\x.png -> salida\A\B\x.png).
 Al actualizar a una version nueva, descomprime encima: settings.json se conserva.
 
 PESTAÑA "Donante -> Receptores"
@@ -83,3 +83,20 @@ CASILLAS EN «FEMALE → FUTA» (v0.5.4): la lista lleva casillas ☐/☑. Marca
 barra espaciadora sobre las filas seleccionadas); hacer clic en otra fila solo cambia la portada del visor y NO desmarca
 nada. Botones: «Marcar todas» (solo las visibles), «Ninguna» y «Marcar las seleccionadas». «Convertir marcadas a futa»
 convierte todas las marcadas, incluidas las que un filtro tenga ocultas (la pestaña te lo avisa).
+
+INSTALACIÓN DE KOIKATSU Y DUPLICADOS EN «FEMALE → FUTA» (v0.6.0)
+- Botón «Instalación de Koikatsu…»: elige la carpeta donde está instalado el juego (la que contiene UserData).
+  La entrada pasa a ser UserData\chara\female y la salida UserData\chara\male. Se recuerda entre sesiones.
+  «Carpetas…» y «Carpeta de salida…» siguen funcionando para cualquier otra carpeta. Ojo: elegir la instalación
+  sustituye la lista de carpetas de entrada de esta pestaña por la female del juego.
+- La carpeta de salida es ahora la propia male/ (antes era una carpeta que contenía male/). El registro (log.txt)
+  y las cards que fallan (errores\) se quedan en KK_Tool\salida\, para no ensuciar la carpeta del juego.
+- Comparación por CONTENIDO: al entrar en la pestaña se indexa la carpeta de salida (la primera vez tarda según
+  cuántas cards haya; después solo lee las nuevas o cambiadas, gracias a huellas_cache.json, que se puede borrar).
+  Dos cards son la misma si coincide su contenido (cara, cuerpo, pelo, ropa, plugins) aunque cambien el nombre del
+  archivo, el nombre del personaje o la portada. Una female y su futa cuentan como la misma.
+- Al MARCAR una card: amarillo pastel = su futa ya está en la salida; azul pastel = aún no. Al seleccionarla, el
+  visor dice con qué archivo coincide. Mientras se indexa no hay colores y «Convertir» espera.
+- Al convertir, las que ya estaban se guardan en <salida>\duplicados\ (con las mismas subcarpetas) en vez de
+  repetirse en male\. Si ya estaban también en duplicados\, se omiten. Si editaste una futa a mano (otro pelo, otra
+  ropa…) deja de coincidir con su female y no cuenta como duplicada.

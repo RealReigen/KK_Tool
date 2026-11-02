@@ -2,6 +2,15 @@
 
 Newest first. The early v1–v7 numbering referred to the project status document; the code started at v0.1.
 
+## 0.6.0 — 2026-10-31
+- **Koikatsu install path**: in "Female → Futa", the new "Instalación de Koikatsu…" button takes the game folder and sets the input to `UserData/chara/female` and the output to `UserData/chara/male` (accepts the install folder, `UserData`, `chara`, or either subfolder). "Carpetas…" and "Carpeta de salida…" still work. The remembered install is `game.install_dir` in `settings.json` (`core/game_paths.py`).
+- **The output folder is now the male folder itself** (setting `tabs.futa.out_male`; before it was a folder containing `male/`). The log (`log.txt`) and `errores/` stay in `KK_Tool/salida/` so nothing but cards goes into the game folder.
+- **Content comparison** (`readers/fingerprint.py`): a card is identified by a hash of its content (face, body, hair, clothes, plugins), ignoring file name, cover image, name, sex and everything the futa conversion changes (futa plugins, genital and penis bones), so a female and its futa have the same fingerprint.
+- **Duplicates**: "Female → Futa" indexes the output folder by content (`batch/futa_index.py`, cached in `huellas_cache.json` so only new or changed cards are re-read). A card whose futa is already in the output is saved to `<output>/duplicados/` (same subfolders) instead of being repeated; if it is already in `duplicados/` too, it is skipped. After saving, the copy's fingerprint is checked against the original's and a warning is logged if they differ.
+- **Checked rows are colored**: pastel yellow = its futa is already in the output, pastel blue = not yet. The viewer also says which file it matches, and the counter shows how many checked cards already have their futa. No color while the output is still being indexed.
+- `convert_cards(paths, out_male, report_dir, …, index=None)` now returns `(converted, skipped, failed, duplicates)`.
+- Added `tests/` (synthetic cards, `python -m unittest discover -s tests`).
+
 ## 0.5.8 — 2026-10-31
 - "Female → Futa": cards that fail (exception, not a full futa after saving, wrong penis size, genital bones left) are now copied to `<output>/errores/` (same subfolders as the input) with a `.txt` giving the reason. The log summary names the folder (`batch/convert.py::copy_to_errors`).
 

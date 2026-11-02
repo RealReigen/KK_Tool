@@ -12,6 +12,9 @@ salida_donaciones/
 *.png
 log.txt
 
+# Caché de huellas de contenido (la crea la app; se puede borrar)
+huellas_cache.json
+
 # --- Python ---
 __pycache__/
 *.py[cod]

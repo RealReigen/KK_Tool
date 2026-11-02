@@ -11,7 +11,7 @@ It is built on the [`kkloader`](https://pypi.org/project/kkloader/) library to r
 | Tab | Purpose |
 |---|---|
 | **Leer datos** (Read data) | Lists cards with name, type (female / male / futa), height, effective penis size, plugins… Includes search, sorting and attribute filters. |
-| **Female → Futa** | Converts the checked cards (☐/☑ checkboxes) to futa atomically, resets the genital bones and sets the penis size according to the body height. |
+| **Female → Futa** | Converts the checked cards (☐/☑ checkboxes) to futa atomically, resets the genital bones and sets the penis size according to the body height. Point it at your Koikatsu install and it uses `UserData/chara/female` → `male`; cards whose futa already exists (compared by content) go to `male/duplicados/`, and checked rows are tinted yellow (already done) or blue (new). |
 | **Donante → Receptores** (Donor → Recipients) | Creates copies of the recipient cards with the body of a donor card (modes: full, keep height, breasts only), optionally converting them to futa. |
 | **Reparar pene (futas)** (Fix penis size) | Fixes the penis size of futas that were already converted (writes new copies). |
 

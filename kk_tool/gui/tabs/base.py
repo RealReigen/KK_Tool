@@ -14,6 +14,7 @@ class CardListTab(ttk.Frame):
     title = "Base"        # texto de la pestaña
     columns = BASE_COLUMNS
     checkable = False     # True = la lista lleva casillas ☐/☑ (marcar no depende de la selección del visor)
+    with_fingerprint = False   # True = cada resumen lleva la huella de contenido (s['huella'])
 
     def __init__(self, master, settings):
         super().__init__(master)
@@ -27,7 +28,8 @@ class CardListTab(ttk.Frame):
         self.panel = CardPanel(self.outer, settings, self.key, self.title, self.columns,
                                log=self.write, on_change=self._sync_buttons,
                                default_folders=self.default_folders() or None,
-                               filters_open=True, checkable=self.checkable)
+                               filters_open=True, checkable=self.checkable,
+                               with_fingerprint=self.with_fingerprint)
         self.outer.add(self.panel, weight=1)
         logf = ttk.Frame(self.outer)
         self.log = tk.Text(logf, height=7, state="disabled")

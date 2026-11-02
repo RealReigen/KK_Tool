@@ -11,7 +11,7 @@ Base técnica: la librería `kkloader` para leer y escribir las cards. Todo el t
 | Pestaña | Función |
 |---|---|
 | **Leer datos** | Lista las cards con nombre, tipo (female / male / futa), altura, tamaño efectivo del pene, plugins… Buscador, orden y filtros por atributos. |
-| **Female → Futa** | Convierte las cards marcadas (casillas ☐/☑) a futa de forma atómica, resetea los huesos genitales y fija el tamaño del pene según la altura. |
+| **Female → Futa** | Convierte las cards marcadas (casillas ☐/☑) a futa de forma atómica, resetea los huesos genitales y fija el tamaño del pene según la altura. Señalando la instalación de Koikatsu usa `UserData/chara/female` → `male`; las cards cuya futa ya existe (comparadas por contenido) van a `male/duplicados/`, y las filas marcadas se pintan amarillo (ya hecha) o azul (nueva). |
 | **Donante → Receptores** | Crea copias de las receptoras con el cuerpo de una card donante (modos total, sin altura, pechos), opcionalmente convirtiéndolas a futa. |
 | **Reparar pene (futas)** | Corrige el tamaño del pene de futas ya hechas (copias nuevas). |
 

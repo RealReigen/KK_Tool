@@ -3,14 +3,22 @@ from pathlib import Path
 from ..core.card_io import load_card
 from ..readers.attributes import derive, safe_defs
 from ..readers.fileinfo import file_info
+from ..readers.fingerprint import fingerprint
 from ..readers.summary import summarize
 
 
-def read_card_summary(path, defs=None):
-    """Resumen de la card + datos del archivo + atributos derivados (lo que muestran las listas)."""
-    s = summarize(load_card(path))
+def read_card_summary(path, defs=None, with_fingerprint=False):
+    """Resumen de la card + datos del archivo + atributos derivados (lo que muestran las listas).
+    with_fingerprint: añade s['huella'] (huella de contenido; None si no se pudo calcular)."""
+    card = load_card(path)
+    s = summarize(card)
     s["archivo_info"] = file_info(path)
     s["attrs"] = derive(s, safe_defs() if defs is None else defs)
+    if with_fingerprint:
+        try:
+            s["huella"] = fingerprint(card)
+        except Exception:
+            s["huella"] = None
     return s
 
 

@@ -4,6 +4,12 @@ Cada panel tiene su `key`: con ella recuerda en settings.json sus carpetas, el a
 columnas y el ancho del visor (tabs.<key>.folders / col_widths / layout.preview_w).
 Se usa en las pestañas normales (CardListTab) y dos veces en Donante → Receptores.
 Teclado (↑↓ Enter Ctrl+A Esc) fuera de la lista: ver key_router.py; las acciones viven aquí.
+
+Ganchos opcionales que las pestañas pueden asignar (todos None = sin efecto):
+  check_tag(iid) -> nombre de tag | None   color de fondo de las filas MARCADAS (ver repaint_checked)
+  caption_extra(path) -> texto | ''        línea extra bajo la portada del visor
+  on_loaded()                              se llama al terminar de leer las carpetas
+Con with_fingerprint=True cada resumen lleva también s['huella'] (huella de contenido de la card).
 """
 import tkinter as tk
 from tkinter import ttk
@@ -65,13 +71,15 @@ class CardPanel(ttk.Frame):
 
     def __init__(self, master, settings, key, title, columns, log, checkable=False,
                  selectmode="extended", on_change=None, default_folders=None, preview_size=(300, 420),
-                 filters_open=False):
+                 filters_open=False, with_fingerprint=False):
         """log(texto): dónde escribir avisos. on_change(): selección, casillas o carga cambiaron."""
         super().__init__(master)
         self.settings, self.key, self.title = settings, key, title
         self.columns, self.checkable = columns, checkable
         self._log, self.on_change = log, on_change
         self._default_folders = default_folders
+        self.with_fingerprint = with_fingerprint
+        self.check_tag = self.caption_extra = self.on_loaded = None
         self.paths, self.summaries, self.checked = {}, {}, set()   # iid -> Path / resumen; iids marcados
         self.entries = {}      # iid -> Entry (todas las filas, también las ocultas por el filtro)
         self._seq = 0
@@ -217,6 +225,19 @@ class CardPanel(ttk.Frame):
     def _set_check(self, iid, on):
         (self.checked.add if on else self.checked.discard)(iid)
         self.tree.set(iid, "chk", CHECK_ON if on else CHECK_OFF)
+        self._paint(iid)
+
+    def _paint(self, iid):
+        """Color de la fila según check_tag (solo las marcadas llevan color)."""
+        if self.check_tag is None:
+            return
+        tag = self.check_tag(iid) if iid in self.checked else None
+        self.tree.item(iid, tags=(tag,) if tag else ())
+
+    def repaint_checked(self):
+        """Vuelve a calcular el color de todas las marcadas (p. ej. cuando llega información nueva)."""
+        for iid in list(self.checked):
+            self._paint(iid)
 
     def check_all(self):
         for iid in self.tree.get_children():
@@ -381,6 +402,9 @@ class CardPanel(ttk.Frame):
                     cap += "\n" + " · ".join(cats)
                 if s.get("donante"):
                     cap += f"\nCuerpo de: {s['donante']} ({s['modo_donacion']})"
+                extra = self.caption_extra(path) if self.caption_extra else ""
+                if extra:
+                    cap += "\n" + extra
             self.preview.show(path, cap)
         else:
             self.preview.clear()
@@ -470,7 +494,7 @@ class CardPanel(ttk.Frame):
             for i, p in enumerate(cards, 1):
                 post(self.status_lbl.configure, text=f"Leyendo {i}/{n}…")
                 try:
-                    s = read_card_summary(p, self.defs)
+                    s = read_card_summary(p, self.defs, self.with_fingerprint)
                 except Exception as e:
                     s = None
                     post(self._log, f"No se pudo leer {p.name}: {e}")
@@ -478,6 +502,8 @@ class CardPanel(ttk.Frame):
             post(self.status_lbl.configure, text="")
             post(self.apply_view)
             post(self._log, f"[{self.title}] Listo: {n} card(s).")
+            if self.on_loaded:
+                post(self.on_loaded)
 
         self._log(f"[{self.title}] Leyendo: " + " | ".join(folders))
         self.worker.start(work)
